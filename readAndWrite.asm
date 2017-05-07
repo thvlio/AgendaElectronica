@@ -289,55 +289,6 @@ readregline_exit:
 
 
 
-######## GETNUMCONTACTS: determina o ID máximo presente no arquivo e o número de contatos e armazena na memória ########
-#### ENTRADAS ####
-# não tem
-#### VARIÁVEIS ####
-# s0 - descritor do arquivo principal
-# s1 - ID máximo encontrado
-# s2 - número de contatos
-#### SAÍDAS ####
-# v0 - número de contatos
-.globl	getNumContacts
-getNumContacts:
-	# salva registradores
-	add	$sp, $sp, -12
-	sw	$s1, 8($sp)
-	sw	$s0, 4($sp)
-	sw	$ra, 0($sp)
-	# abre para leitura
-	la	$a0, fileName
-	li	$a1, 0
-	li	$v0, 13
-	syscall
-	move	$s0, $v0	# salva o descritor
-	move	$s1, $zero	# inicializa o número de contatos com zero
-loop_id:
-	# le um registro do arquivo
-	move	$a0, $s0
-	la	$a1, regBuffer
-	la	$a2, fieldSizes
-	jal	readRegLine
-	beq	$v0, $zero, endoffile	# end of file
-	addi	$s1, $s1, 1
-	j	loop_id
-endoffile:
-	# fecha o arquivo
-	li	$v0, 16
-	syscall
-	# retorna o numero de contatos
-	move	$v0, $s1
-	# recupera registradores
-	lw	$ra, 0($sp)
-	lw	$s0, 4($sp)
-	lw	$s1, 8($sp)
-	add	$sp, $sp, 12
-	jr	$ra
-
-
-
-
-
 ######## CREATEFILE: cria o arquivo de registros se ele não existir ########
 #### ENTRADAS ####
 # não tem

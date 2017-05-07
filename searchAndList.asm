@@ -3,16 +3,16 @@
 fileName:	.asciiz	"db.txt"
 auxFileName:	.asciiz	"auxdb.txt"
 # mensagens para mostrar na hora de mostrar a lista de contatos
-listMsg:	.asciiz "Lista de contatos:\n(página 000 de 000)\n\n"	# addr 27 e addr 34 sao as paginas, tamanho 40
-searchMsg:	.asciiz "Os contatos encontrados estão listado abaixo. Escolha um dos contatos ou escolha 0 para avançar:\n(página 000 de 000)\n\n"	# addr 105 e addr 112 sao as paginas, tamanho 118
-tryagainmsg:	.asciiz	"ERRO: ENTRADA INVÁLIDA. TENTE NOVAMENTE"
-cancelmsg:	.asciiz	"Tem certeza que deseja cancelar a operação de busca?"
+listMsg:	.asciiz "Lista de contatos:\n(pagina 000 de 000)\n\n"	# addr 27 e addr 34 sao as paginas, tamanho 40
+searchMsg:	.asciiz "Os contatos encontrados estao listado abaixo. Escolha um dos contatos ou escolha 0 para avancar:\n(pagina 000 de 000)\n\n"	# addr 105 e addr 112 sao as paginas, tamanho 118
+tryagainmsg:	.asciiz	"ERRO: ENTRADA INVALIDA. TENTE NOVAMENTE"
+cancelmsg:	.asciiz	"Tem certeza que deseja cancelar a operacao de busca?"
 name:		.asciiz "Nome: "	# tamanho 6
 short:		.asciiz "\nApelido: "	# tamanho 10
 email:		.asciiz "\nE-mail: "	# tamanho 9
 phone:		.asciiz "\nTelefone: "	# tamanho 11
 # mensagem de confirmacao
-confirmmsg1:	.asciiz	"Confirmar seleção do contato \""
+confirmmsg1:	.asciiz	"Confirmar selecao do contato \""
 confirmmsg2:	.space	250
 # buffer temporario para armazenar 5 registros (para mostrar na lista de contatos)
 contacts:	.space	2700
@@ -446,27 +446,30 @@ confirmName:
 
 ######## CHOOSENAME: mostra uma lista dos contatos encontrados ao usuário e pede para que ele escolha um ########
 #### ENTRADAS ####
-# não tem
+# a0 - numero total de contatos no arquivo auxiliar
 #### VARIÁVEIS ####
 # s0 - descritor do arquivo auxiliar
 # s1 - numero de contatos lidos do arquivo auxiliar para cada iteração
 # s2 - posicao de escrita em contacts / flag de eof
 # s3 - numero do menor contato presente na pagina
 # s4 - posição de escrita em nameBuffer
+# s5 - numero total de contatos no arquivo auxiliar
 #### SAÍDAS ####
 # v0 - número do registro selecionado no arquivo auxiliar (não é o ID)
 .globl	chooseName
 chooseName:
 	# salva registradores
-	addi	$sp, $sp, -24
+	addi	$sp, $sp, -28
 	sw	$ra, 0($sp)
 	sw	$s0, 4($sp)
 	sw	$s1, 8($sp)
 	sw	$s2, 12($sp)
 	sw	$s3, 16($sp)
 	sw	$s4, 20($sp)
+	sw	$s5, 24($sp)
 	# número total de contatos no arquivo auxiliar
 	move	$s1, $a0
+	move	$s5, $a0
 	# abre o arquivo p leitura
 	la	$a0, auxFileName
 	li	$a1, 0
@@ -477,7 +480,7 @@ chooseName:
 	la	$a0, searchMsg+112
 	move	$a1, $s1
 	jal	pageNumber
-	move	$s1, $zero	# numero de contatos lidos
+	move	$s1, $zero	# numero de contatos lidos nos loops a seguir
 	# escreve a string searchMsg no começo de contacts
 	la	$a0, contacts
 	la	$a1, searchMsg
@@ -515,8 +518,8 @@ loop_readinfo:
 contacts_print:
 	# checa se chegou a ler pelo menos um contato
 	rem	$t0, $s1, 5	# dá o número de contatos lidos na iteração
-	bne	$v0, $zero, notyeteof	# se nao saiu por eof, parte para a impressao
-	beq	$t0, $zero, choose_exit	# se saiu por eof e nao leu nenhum contato, sai da funcao
+	bnez	$v0, notyeteof	# se nao saiu por eof, parte para a impressao
+	beqz	$t0, choose_exit	# se saiu por eof e nao leu nenhum contato, sai da funcao
 notyeteof:		# ele entra aqui se leu pelo menos 1 contato e saiu por eof ou saiu por ter lido 5
 	# acrescenta um '\0' ao final de contacts
 	li	$t2, '\0'
@@ -539,6 +542,8 @@ shownames:
 	# se escolheu a0 = 0, checa mais duas condicoes
 	# se a0 = 0 e s2 = 0, escolheu avancar e sair, mesmo que cancelar
 	beqz	$s2, choose_cancel
+	# se a0 = 0 e s2 != 0 mas o programa tiver lido todos os contatos, avancar tambem eh cancelar
+	beq	$s1, $s5, choose_cancel
 	# se a0 = 0 e s2 != 0, volta ao loop
 	j	loop_readandprint
 notzero:
@@ -587,13 +592,14 @@ choose_exit:
 	# valor de retorno
 	move	$v0, $t0
 	# recupera registradores
+	lw	$s5, 24($sp)
 	lw	$s4, 20($sp)
 	lw	$s3, 16($sp)
 	lw	$s2, 12($sp)
 	lw	$s1, 8($sp)
 	lw	$s0, 4($sp)
 	lw	$ra, 0($sp)
-	addi	$sp, $sp, 24
+	addi	$sp, $sp, 28
 	jr	$ra
 
 

@@ -101,16 +101,18 @@ theend:
 # s0 - descritor do arquivo principal
 # s1 - descritor do arquivo auxiliar
 # s2 - tamanho total de um registro
+# s3 - número de contatos no arquivo auxiliar
 #### SAÍDAS ####
-# não tem
+# v0 - número de contatos no arquivo auxiliar
 .globl	refreshFile
 refreshFile:
 	# salva registradores
-	addi	$sp, $sp, -16
+	addi	$sp, $sp, -20
 	sw	$ra, 0($sp)
 	sw	$s0, 4($sp)
 	sw	$s1, 8($sp)
 	sw	$s2, 12($sp)
+	sw	$s3, 16($sp)
 	# abre o arquivo principal para escrita
 	la	$a0, fileName
 	li	$a1, 1		# sobrescreve o arquivo principal anterior
@@ -123,6 +125,8 @@ refreshFile:
 	li	$v0, 13
 	syscall
 	move	$s1, $v0
+	# número de contatos lidos
+	move	$s3, $zero
 refresh_loop:
 	# le o registro (do arquivo auxiliar)
 	# le um registro
@@ -131,6 +135,8 @@ refresh_loop:
 	la	$a2, fieldSizes
 	jal	readRegLine
 	beq	$v0, $zero, done_copying	# sai se resultar em eof
+	# soma um no numero de contatos lidos
+	addi	$s3, $s3, 1
 	# escreve no arquivo principal
 	move	$a0, $s0
 	la	$a1, regBuffer
@@ -147,12 +153,15 @@ done_copying:
 	move	$a0, $s1
 	li	$v0, 16
 	syscall
+	# retorna o num de contatos
+	move	$v0, $s3
 	# recupera os registradores
+	lw	$s3, 16($sp)
 	lw	$s2, 12($sp)
 	lw	$s1, 8($sp)
 	lw	$s0, 4($sp)
 	lw	$ra, 0($sp)
-	addi	$sp, $sp, 16
+	addi	$sp, $sp, 20
 	jr	$ra
 
 

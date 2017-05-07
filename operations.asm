@@ -1,9 +1,9 @@
 .data
 # mensagens para quando o programa pedir dados ao usuário
-msg1:		.asciiz	"NAME:"
-msg2:		.asciiz	"NICK:"
-msg3:		.asciiz	"E-MAIL:"
-msg4:		.asciiz	"PHONE:"
+msg1:		.asciiz	"Nome completo (máximo de 200 caracteres):"
+msg2:		.asciiz	"Apelido (máximo de 30 caracteres):"
+msg3:		.asciiz	"Endereco de e-mail (máximo de 200 caracteres):"
+msg4:		.asciiz	"Numero do telefone\n(insira 10 digitos, sendo os 2 primeiros o DDD e os 8 últimos o telefone):"
 # buffers para os campos do registro
 bid:		.space	11
 bname:		.space	201
@@ -17,9 +17,9 @@ baddr:		.word	bname, bnick, bemail, bphone
 bsizes:		.word	0, 0, 0, 0
 # mensagens variadas ao usuário
 nfoundmsg:	.asciiz "Nenhum registro encontrado na busca. Aperte OK para voltar ao menu. "
-confirmmsg:	.asciiz "Confirmada a operação de inserção de dados? Não sendo confirmada, o programa irá requisitar os dados novamente."
-cancelmsg:	.asciiz "Tem certeza de que deseja cancelar a inserção dos dados?"
-tryagainmsg:	.asciiz "Entrada inválida! Tente digitar o dado requerido novamente."
+confirmmsg:	.asciiz "Confirmada a operacao de insercao de dados? Nao sendo confirmada, o programa ira requisitar os dados novamente."
+cancelmsg:	.asciiz "Tem certeza de que deseja cancelar a insercao dos dados?"
+tryagainmsg:	.asciiz "Entrada invalida! Tente digitar o dado requerido novamente."
 
 
 
@@ -35,9 +35,8 @@ prepareProgram:
 	# preparacoes (tem q ser executado antes de qualquer coisa)
 	jal	createFile	# cria o arquivo se ele nao existir
 	move	$a0, $zero
-	jal	correctFile
-	jal	refreshFile
-	jal	getNumContacts	# encontra o número de contatos na agenda e retorna este número
+	jal	correctFile	# re-enumera os IDs do arquivo principal
+	jal	refreshFile	# copia o auxiliar no principal e retorna quantos contatos leu
 	# recupera ra
 	lw	$ra, 0($sp)
 	addi	$sp, $sp, 4

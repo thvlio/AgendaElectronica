@@ -1,6 +1,6 @@
 .data
 # mensagens do menu inicial. tamanhos: 245, 34, 23 e 7
-header:		.asciiz	"=====================\n   AGENDA ELETRÔNICA   \n=====================\nEscolha uma opção:\n1. Adicionar novo registro\n2. Mostrar lista de registros\n3. Buscar registro\n4. Editar registro selecionado\n5. Apagar registro selecionado\n6. Apagar toda a lista de contatos\n7. Sair do programa\n"
+header:		.asciiz	"=====================\n   AGENDA ELETRONICA   \n=====================\nEscolha uma opcao:\n1. Adicionar novo registro\n2. Mostrar lista de registros\n3. Buscar registro\n4. Editar registro selecionado\n5. Apagar registro selecionado\n6. Apagar toda a lista de contatos\n7. Sair do programa\n"
 numregmsg:	.asciiz	"\nTotal de contatos na agenda: 000\n"	# numero começa em 30
 regmsg:		.asciiz	"\nRegistro selecionado: "
 placeholder:	.asciiz	"nenhum\n"
@@ -12,17 +12,17 @@ selectedID:	.word	0
 namesize:	.word	0
 numContacts:	.word	0
 # mensagens variadas
-tryagainmsg:	.asciiz	"ERRO: ENTRADA INVÁLIDA. TENTE NOVAMENTE"
-goodbyemsg:	.asciiz	"VALEU FERINHA"
+tryagainmsg:	.asciiz	"ERRO: ENTRADA INVALIDA. TENTE NOVAMENTE"
+#goodbyemsg:	.asciiz	"VALEU FERINHA\nVOLTE SEMPRE"
 lettermsg:	.asciiz	"Digite a primeira letra do nome."
-cancelmsg:	.asciiz "Tem certeza que deseja cancelar a operação de busca?"
+cancelmsg:	.asciiz "Tem certeza que deseja cancelar a operacao de busca?"
 confirmexit:	.asciiz "Tem certeza que deseja sair do programa?"
-noselectionmsg:	.asciiz	"Nenhum contato foi selecionado. Use a função de busca para selecionar um contato e tente novamente."
-fullmsg:	.asciiz	"A agenda está com o limite máximo de contatos (999)."
-emptymsg:	.asciiz	"Nao há contatos na agenda."
+noselectionmsg:	.asciiz	"Nenhum contato foi selecionado. Use a funcao de busca para selecionar um contato e tente novamente."
+fullmsg:	.asciiz	"A agenda esta com o limite maximo de contatos (999)."
+emptymsg:	.asciiz	"Nao ha contatos na agenda."
 deletemsg:	.asciiz "Tem certeza que deseja apagar o contato selecionado?"
-editmsg:	.asciiz	"Tem certeza que deseja editar o contato selecionado? Você só pode editar o contato inteiro, e não campos específicos."
-deleteallmsg:	.asciiz	"Tem certeza que deseja apagar toda a lista? Esta operação não pode ser revertida."
+editmsg:	.asciiz	"Tem certeza que deseja editar o contato selecionado? Voce so pode editar o contato inteiro, e nao campos especificos."
+deleteallmsg:	.asciiz	"Tem certeza que deseja apagar toda a lista? Esta operacao nao pode ser revertida."
 letter:		.space	2
 
 
@@ -229,10 +229,10 @@ exit:
 	syscall
 	bne	$a0, 0, menuloop
 	# sair do programa
-	la	$a0, goodbyemsg
-	li	$a1, 1	# info message
-	li	$v0, 55
-	syscall
+	#la	$a0, goodbyemsg
+	#li	$a1, 1	# info message
+	#li	$v0, 55
+	#syscall
 	li	$v0, 10
 	syscall
 
